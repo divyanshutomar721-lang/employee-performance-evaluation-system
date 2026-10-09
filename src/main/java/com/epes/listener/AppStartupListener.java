@@ -1,5 +1,7 @@
 package com.epes.listener;
 
+import com.epes.config.AppConstants;
+import com.epes.config.AppContext;
 import com.epes.dao.UserDao;
 import com.epes.dao.impl.UserDaoImpl;
 import com.epes.exception.ConfigurationException;
@@ -22,8 +24,8 @@ import java.util.logging.Logger;
 /**
  * Application startup and shutdown listener.
  *
- * <p>Initializes the database schema on context startup and automatically
- * bootstraps an initial system administrator if {@code ADMIN_EMAIL} is defined.</p>
+ * <p>Initializes the database schema, seeds the optional administrator, constructs the central
+ * {@link AppContext}, starts background threads, and guarantees graceful cleanup on shutdown.</p>
  */
 @WebListener
 public class AppStartupListener implements ServletContextListener {
@@ -45,6 +47,11 @@ public class AppStartupListener implements ServletContextListener {
             // 2. Bootstrap admin user if ADMIN_EMAIL is provided
             bootstrapAdminUser(connectionFactory);
 
+            // 3. Instantiate AppContext, start background daemons, and store in ServletContext
+            AppContext appContext = new AppContext(connectionFactory);
+            appContext.start();
+            sce.getServletContext().setAttribute(AppConstants.APP_CONTEXT, appContext);
+
             LOG.info("EPES Application initialized successfully.");
         } catch (ConfigurationException ce) {
             LOG.log(Level.WARNING, "Database configuration missing during startup: " + ce.getMessage()
@@ -59,7 +66,12 @@ public class AppStartupListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        LOG.info("Shutting down Employee Performance Evaluation System (EPES).");
+        LOG.info("Shutting down Employee Performance Evaluation System (EPES)...");
+        Object ctx = sce.getServletContext().getAttribute(AppConstants.APP_CONTEXT);
+        if (ctx instanceof AppContext appContext) {
+            appContext.shutdown();
+        }
+        LOG.info("EPES shutdown completed.");
     }
 
     /**

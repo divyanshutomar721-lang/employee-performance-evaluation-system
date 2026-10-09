@@ -21,4 +21,7 @@ public final class AppConstants {
 
     /** Default page encoding. */
     public static final String ENCODING = "UTF-8";
+
+    /** ServletContext attribute key for the central application context. */
+    public static final String APP_CONTEXT = "com.epes.APP_CONTEXT";
 }
