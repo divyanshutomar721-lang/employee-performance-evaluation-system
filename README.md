@@ -12,7 +12,7 @@ Employees track their progress, view feedback, set personal goals and view their
 | Build      | Apache Maven (WAR packaging)                          |
 | Web        | Jakarta Servlet 6.0, JSP, JSTL (Tomcat 10.1)         |
 | Database   | PostgreSQL (plain JDBC, DAO pattern, transactions)    |
-| Frontend   | JSP + Bootstrap 5 (CDN) + Chart.js (CDN — later)     |
+| Frontend   | JSP + Bootstrap 5 (CDN) + Bootstrap Icons + CSS3      |
 | Logging    | `java.util.logging`                                   |
 | Testing    | JUnit 5 (Jupiter), Maven Surefire                     |
 
@@ -55,6 +55,37 @@ Employees track their progress, view feedback, set personal goals and view their
    - **Application**: [http://localhost:8080/epes/](http://localhost:8080/epes/)
    - **Health check**: [http://localhost:8080/epes/health](http://localhost:8080/epes/health)
 
+## Security Architecture
+
+The application enforces a multi-layered defence-in-depth architecture across filter, servlet, and service layers:
+
+### 1. Filter Pipeline (Order of Execution)
+1. **`EncodingFilter`** (`/*`): Forces UTF-8 character encoding on all requests and responses.
+2. **`SecurityHeadersFilter`** (`/*`): Injects standard security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`) and applies `Cache-Control: no-store` on non-asset requests.
+3. **`AuthenticationFilter`** (`/*`): Blocks unauthenticated access to protected endpoints, redirecting visitors to `/login` without creating dummy sessions.
+4. **`RoleFilter`** (`/*`): Enforces role access by URL prefix (`/admin/*`, `/manager/*`, `/employee/*`), returning HTTP 403 on authorization mismatch.
+5. **`CsrfFilter`** (`/*`): Validates cryptographically secure `_csrf` tokens on every `POST` request (including login and logout) using constant-time comparison (`MessageDigest.isEqual`), rejecting expired or missing tokens with HTTP 403.
+
+### 2. Session Management & Fixation Defense
+- **Session Timeout**: 30 minutes, cookie-tracked with `HttpOnly` enabled.
+- **Session Fixation Defense**: On successful authentication (`LoginServlet`), the existing session is invalidated and replaced with a newly generated session and a fresh CSRF token.
+- **Session Invalidation**: `LogoutServlet` completely invalidates the session upon POST logout.
+
+### 3. Role Access Table & Application Endpoints
+
+| URL Pattern | Method | Permitted Roles | Description |
+|---|:---:|:---:|---|
+| `/` | GET | Anonymous / Any | Public landing page (redirects to `/home` if already logged in) |
+| `/login` | GET, POST | Anonymous | Login page with CSRF token; POST authenticates and renews session |
+| `/logout` | POST | Authenticated | Invalidates session and redirects to `/login` with flash alert |
+| `/home` | GET | Authenticated | Dispatches user to role-specific dashboard |
+| `/admin/dashboard` | GET | `ADMIN` | Admin dashboard shell & system governance |
+| `/manager/dashboard` | GET | `MANAGER` | Manager dashboard shell & team performance |
+| `/employee/dashboard` | GET | `EMPLOYEE` | Employee dashboard shell & personal goal tracking |
+| `/health` | GET | Anonymous / Any | Health check confirming database connectivity |
+| `/error` | GET, POST | Anonymous / Any | Central error handler rendering safe error views |
+| `/assets/*` | GET | Anonymous / Any | Static CSS and JavaScript assets |
+
 ## Service Layer and Business Rules
 
 The service layer encapsulates validation, authorization, atomic transactions, and business logic:
@@ -89,11 +120,10 @@ Full data dictionary and text ER diagrams are documented in [db/README.md](db/RE
 
 ## Running Tests
 
-Unit tests (pure math, validators, rules, schedulers) and service integration tests run via Maven Surefire:
+Unit and integration tests run via Maven Surefire:
 ```bash
 mvn test
 ```
-*Note*: Service integration tests use unique test data namespaces (`*@epes.test`, `T-*`) with FK-safe teardown ensuring zero test rows remain in the database.
 
 ## Project Structure
 
@@ -104,31 +134,40 @@ src/main/java/com/epes/
   dao/          — DAO interfaces (UserDao, TeamDao, CriterionDao, EvaluationDao, GoalDao, FeedbackDao)
   dao/impl/     — Plain JDBC DAO implementations
   exception/    — ServiceException hierarchy (Validation, Auth, BusinessRule) & DataAccessException
-  filter/       — Servlet filters
+  filter/       — AccessPolicy, EncodingFilter, SecurityHeadersFilter, AuthenticationFilter, RoleFilter, CsrfFilter
   listener/     — AppStartupListener (schema init, admin bootstrap, AppContext lifecycle)
   model/        — Domain objects (User, Admin, Manager, Employee, Team, Criterion, Evaluation, Goal, Feedback, RocketStage)
   service/      — Service interfaces, ScoreCalculator, GoalProgressRule
   service/impl/ — Service implementations
   service/report/ — EmployeeReport, TeamReport, ManagerOverview, ReportAggregator, Trend
-  servlet/      — HTTP servlets (HealthServlet)
-  util/         — ConnectionFactory, TransactionManager, SchemaInitializer, Validator
+  servlet/      — BaseServlet, HomeServlet, LoginServlet, LogoutServlet, AdminDashboardServlet, ManagerDashboardServlet, EmployeeDashboardServlet, ErrorServlet, HealthServlet
+  util/         — ConnectionFactory, TransactionManager, SchemaInitializer, Validator, CsrfTokens, CsrfSupport, Flash, FlashMessage
 
 src/main/resources/
   db/schema.sql — Idempotent PostgreSQL DDL script
 
 src/main/webapp/
   index.jsp
+  assets/css/style.css
   WEB-INF/web.xml
   WEB-INF/views/
-  assets/css/  assets/js/
+    login.jsp
+    error.jsp
+    admin.jsp
+    manager.jsp
+    employee.jsp
+    fragments/
+      header.jspf
+      footer.jspf
 
 src/test/java/com/epes/
   concurrent/   — GoalDeadlineSchedulerTest, ReportJobServiceTest
   dao/          — BaseDaoTest, UserDaoTest, TeamDaoTest, CriterionDaoTest, EvaluationDaoTest, GoalDaoTest, FeedbackDaoTest
+  filter/       — AccessPolicyTest
   model/        — RocketStageTest
   service/      — BaseServiceTest, ScoreCalculatorTest, GoalProgressRuleTest, AuthServiceTest, UserServiceTest, TeamServiceTest, CriterionServiceTest, EvaluationServiceTest, GoalServiceTest, FeedbackServiceTest, ReportServiceTest
   service/report/ — ReportAggregatorTest
-  util/         — ValidatorTest, TransactionRollbackTest
+  util/         — ValidatorTest, TransactionRollbackTest, CsrfTokensTest, FlashTest
 
 db/             — Database documentation & data dictionary (README.md)
 docs/           — College project documentation
@@ -139,5 +178,5 @@ docs/           — College project documentation
 - [x] **Phase 0** — Maven WAR skeleton, config, health check
 - [x] **Phase 1** — Database schema, domain model (OOP), JDBC DAOs, transaction support
 - [x] **Phase 2** — Services, validation, scoring, reports, concurrency
-- [ ] Phase 3 — Authentication, authorization filters, and servlets
+- [x] **Phase 3** — Authentication, authorization filters, CSRF protection, error handling, dashboard shells
 - [ ] Phase 4 — JSP views, dashboards, Bootstrap 5 UI & charts

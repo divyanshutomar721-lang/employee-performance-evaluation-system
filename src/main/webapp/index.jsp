@@ -1,4 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:if test="${not empty sessionScope.currentUser}">
+    <c:redirect url="/home" />
+</c:if>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +17,9 @@
           rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YcnS/1DYZb5BjAo60FmBJLPic4G8gYTLfGn"
           crossorigin="anonymous">
-
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
           rel="stylesheet">
@@ -41,7 +47,6 @@
             margin: 0;
         }
 
-        /* Gradient hero */
         .hero {
             flex: 1;
             display: flex;
@@ -157,10 +162,14 @@
     <div class="hero-card">
         <h1>Employee Performance Evaluation System</h1>
         <p>
-            Track goals, share feedback, and drive performance —
+            Track goals, share feedback, and drive performance &mdash;
             all in one place. Built for managers and employees.
         </p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="${pageContext.request.contextPath}/login"
+               class="btn-epes">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign in
+            </a>
             <a href="${pageContext.request.contextPath}/health"
                class="btn-outline-epes">System Health</a>
         </div>

@@ -18,4 +18,14 @@ public interface AuthService {
      * @throws DataAccessException     if a database error occurs
      */
     User authenticate(String email) throws AuthenticationException, DataAccessException;
+
+    /**
+     * Returns whether temporary (email-only) login mode is currently active.
+     *
+     * @return true if email-only authentication is enabled
+     */
+    default boolean isTemporaryLoginActive() {
+        return false;
+    }
 }
+

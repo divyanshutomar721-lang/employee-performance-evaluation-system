@@ -1,1 +1,116 @@
-/* EPES — custom styles (placeholder for future phases) */
+:root {
+    --epes-primary: #4f46e5;
+    --epes-primary-hover: #4338ca;
+    --epes-primary-subtle: #eef2ff;
+    --epes-bg: #f8fafc;
+    --epes-card-bg: #ffffff;
+    --epes-text-main: #0f172a;
+    --epes-text-muted: #64748b;
+    --epes-border: #e2e8f0;
+
+    /* Rocket stage semantic palette */
+    --stage-launchpad: #64748b;
+    --stage-liftoff: #2563eb;
+    --stage-orbit: #0891b2;
+    --stage-cruise: #16a34a;
+    --stage-summit: #d97706;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--epes-bg);
+    color: var(--epes-text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Navbar */
+.navbar-epes {
+    background-color: #0f172a;
+    border-bottom: 1px solid #1e293b;
+}
+
+.navbar-epes .navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: #ffffff;
+}
+
+.navbar-epes .nav-link {
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.navbar-epes .nav-link:hover,
+.navbar-epes .nav-link.active {
+    color: #ffffff;
+}
+
+/* Cards & Placeholders */
+.epes-card {
+    background: var(--epes-card-bg);
+    border: 1px solid var(--epes-border);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.epes-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.epes-card.disabled-feature {
+    opacity: 0.85;
+    background-color: #fcfdfe;
+    border-style: dashed;
+}
+
+.epes-card.disabled-feature:hover {
+    transform: none;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Rocket Stage Badges */
+.badge-stage-launchpad {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.badge-stage-liftoff {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.badge-stage-orbit {
+    background-color: #ecfeff;
+    color: #0e7490;
+    border: 1px solid #a5f3fc;
+}
+
+.badge-stage-cruise {
+    background-color: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.badge-stage-summit {
+    background-color: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+/* Footer */
+footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--epes-border);
+    background-color: #ffffff;
+    color: var(--epes-text-muted);
+    font-size: 0.875rem;
+}

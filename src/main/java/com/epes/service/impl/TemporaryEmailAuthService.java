@@ -77,6 +77,11 @@ public class TemporaryEmailAuthService implements AuthService {
         return optUser.get();
     }
 
+    @Override
+    public boolean isTemporaryLoginActive() {
+        return tempLoginEnabled;
+    }
+
     private static boolean parseEnvFlag(String name, boolean defaultValue) {
         String val = System.getenv(name);
         if (val == null || val.isBlank()) {

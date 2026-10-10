@@ -24,4 +24,32 @@ public final class AppConstants {
 
     /** ServletContext attribute key for the central application context. */
     public static final String APP_CONTEXT = "com.epes.APP_CONTEXT";
+
+    // ── Session attribute names ──────────────────────────────────────────
+
+    /** Session attribute: the authenticated {@code User} object. */
+    public static final String SESSION_USER = "currentUser";
+
+    /** Session attribute: CSRF token string. */
+    public static final String SESSION_CSRF = "csrfToken";
+
+    /** Session attribute: list of {@link com.epes.util.FlashMessage}s. */
+    public static final String SESSION_FLASH = "flashMessages";
+
+    // ── Request attribute names ──────────────────────────────────────────
+
+    /** Request attribute: CSRF token exposed to JSP forms. */
+    public static final String REQ_CSRF_TOKEN = "csrfToken";
+
+    /** Request attribute: error status code (Integer). */
+    public static final String REQ_ERROR_STATUS = "errorStatus";
+
+    /** Request attribute: error display message (String). */
+    public static final String REQ_ERROR_MESSAGE = "errorMessage";
+
+    /** Request attribute: validation error messages (List&lt;String&gt;). */
+    public static final String REQ_VALIDATION_ERRORS = "validationErrors";
+
+    /** Request attribute: consumed flash messages (List&lt;FlashMessage&gt;). */
+    public static final String REQ_FLASH_MESSAGES = "flashMessages";
 }
