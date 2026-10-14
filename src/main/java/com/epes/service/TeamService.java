@@ -75,4 +75,15 @@ public interface TeamService {
      * Lists teams relevant to the actor (managed teams for managers, member teams for employees).
      */
     List<Team> listMyTeams(User actor) throws AuthorizationException, DataAccessException;
+
+    /**
+     * Lists active employees eligible for assignment to teams.
+     * Restricted to managers.
+     *
+     * @param actor authenticated manager
+     * @return list of active employee summaries sorted by full name case-insensitively
+     * @throws AuthorizationException if actor is not a manager
+     * @throws DataAccessException    if a database error occurs
+     */
+    List<UserSummary> listAssignableEmployees(User actor) throws AuthorizationException, DataAccessException;
 }

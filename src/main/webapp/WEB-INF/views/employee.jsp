@@ -11,7 +11,16 @@
             </h1>
             <p class="text-muted mb-0">
                 <span class="badge bg-success me-2">EMPLOYEE</span>
-                <span>Individual Growth & Performance &mdash; Rocket Stage: <strong class="text-primary"><c:out value="${user.rocketStage}"/></strong></span>
+                <span>Individual Growth & Performance &mdash; Rocket Stage:
+                    <c:choose>
+                        <c:when test="${not empty rocketStage}">
+                            <strong class="text-primary"><c:out value="${rocketStage}"/></strong>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="text-muted fst-italic">No evaluations yet</span>
+                        </c:otherwise>
+                    </c:choose>
+                </span>
             </p>
         </div>
     </div>

@@ -79,9 +79,25 @@ The application enforces a multi-layered defence-in-depth architecture across fi
 | `/login` | GET, POST | Anonymous | Login page with CSRF token; POST authenticates and renews session |
 | `/logout` | POST | Authenticated | Invalidates session and redirects to `/login` with flash alert |
 | `/home` | GET | Authenticated | Dispatches user to role-specific dashboard |
-| `/admin/dashboard` | GET | `ADMIN` | Admin dashboard shell & system governance |
-| `/manager/dashboard` | GET | `MANAGER` | Manager dashboard shell & team performance |
-| `/employee/dashboard` | GET | `EMPLOYEE` | Employee dashboard shell & personal goal tracking |
+| `/admin/dashboard` | GET | `ADMIN` | Admin dashboard with live user count metrics |
+| `/admin/users` | GET | `ADMIN` | User directory and user creation form |
+| `/admin/users/create` | POST | `ADMIN` | Creates a new user (ADMIN, MANAGER, EMPLOYEE) |
+| `/admin/users/role` | POST | `ADMIN` | Updates a user's system role |
+| `/admin/users/active` | POST | `ADMIN` | Activates or deactivates a user account |
+| `/manager/dashboard` | GET | `MANAGER` | Manager dashboard with live team and criteria metrics |
+| `/manager/criteria` | GET | `MANAGER` | Evaluation criteria list, active weight summary, and creation form |
+| `/manager/criteria/save` | POST | `MANAGER` | Creates or updates an evaluation criterion |
+| `/manager/criteria/deactivate`| POST | `MANAGER` | Deactivates a criterion |
+| `/manager/criteria/delete` | POST | `MANAGER` | Permanently deletes a criterion |
+| `/manager/teams` | GET | `MANAGER` | Managed teams overview and new team form with member picker |
+| `/manager/teams/create` | POST | `MANAGER` | Creates a new team with member assignments in one transaction |
+| `/manager/teams/view` | GET | `MANAGER` | Team detail page, member roster, role updates, and member add |
+| `/manager/teams/update` | POST | `MANAGER` | Updates team name and description |
+| `/manager/teams/delete` | POST | `MANAGER` | Deletes a team and its member associations |
+| `/manager/teams/members/add` | POST | `MANAGER` | Adds an active employee to a team |
+| `/manager/teams/members/role` | POST | `MANAGER` | Updates a member's role in a team |
+| `/manager/teams/members/remove`| POST | `MANAGER` | Removes a member from a team |
+| `/employee/dashboard` | GET | `EMPLOYEE` | Employee dashboard shell & performance rocket stage |
 | `/health` | GET | Anonymous / Any | Health check confirming database connectivity |
 | `/error` | GET, POST | Anonymous / Any | Central error handler rendering safe error views |
 | `/assets/*` | GET | Anonymous / Any | Static CSS and JavaScript assets |
@@ -125,6 +141,29 @@ Unit and integration tests run via Maven Surefire:
 mvn test
 ```
 
+## How to Use (Admin and Manager)
+
+For detailed step-by-step instructions, see the [Phase 4A User Guide](docs/04-user-guide.md).
+
+### Administrator Workflows
+1. **Log in** with admin credentials. You will be redirected to `/admin/dashboard` showing live user counts across roles and account statuses.
+2. Navigate to **Users** (`/admin/users`) to inspect all system accounts.
+3. **Create Users**: Fill in email, full name, and select a system role (`ADMIN`, `MANAGER`, or `EMPLOYEE`).
+4. **Change Role**: Select a new role from the dropdown for any user and click **Save**. Self-demotion and last-active-admin demotion are rejected.
+5. **Activate / Deactivate**: Click **Deactivate** or **Activate** to control account status. Self-deactivation is strictly prohibited.
+
+### Manager Workflows
+1. **Log in** with manager credentials. You will be redirected to `/manager/dashboard` displaying team, criteria, and employee counts.
+2. Navigate to **Criteria** (`/manager/criteria`):
+   - Add evaluation criteria with weights (1 to 100) and descriptions.
+   - Monitor the total active weight to ensure criteria sum to 100% for evaluation cycles.
+   - Edit, deactivate, or delete criteria as needed. Criteria are snapshotted into evaluations at creation time.
+3. Navigate to **Teams** (`/manager/teams`):
+   - Create a team by entering a name, description, and selecting active employees from the member picker with assigned roles (e.g., `Tech Lead`, `Member`).
+   - Click **Open** on any team to view `/manager/teams/view?id=N`.
+   - Update team details, edit member roles, remove members, add new available employees, or delete the team.
+   - Ownership is strictly enforced: managers cannot view or modify teams belonging to other managers.
+
 ## Project Structure
 
 ```
@@ -137,11 +176,11 @@ src/main/java/com/epes/
   filter/       — AccessPolicy, EncodingFilter, SecurityHeadersFilter, AuthenticationFilter, RoleFilter, CsrfFilter
   listener/     — AppStartupListener (schema init, admin bootstrap, AppContext lifecycle)
   model/        — Domain objects (User, Admin, Manager, Employee, Team, Criterion, Evaluation, Goal, Feedback, RocketStage)
-  service/      — Service interfaces, ScoreCalculator, GoalProgressRule
-  service/impl/ — Service implementations
+  service/      — Service interfaces (UserService, TeamService, CriterionService, EvaluationService, GoalService, FeedbackService, ReportService, UserLookupService, UserSummary), ScoreCalculator, GoalProgressRule
+  service/impl/ — Service implementations (including UserLookupServiceImpl)
   service/report/ — EmployeeReport, TeamReport, ManagerOverview, ReportAggregator, Trend
-  servlet/      — BaseServlet, HomeServlet, LoginServlet, LogoutServlet, AdminDashboardServlet, ManagerDashboardServlet, EmployeeDashboardServlet, ErrorServlet, HealthServlet
-  util/         — ConnectionFactory, TransactionManager, SchemaInitializer, Validator, CsrfTokens, CsrfSupport, Flash, FlashMessage
+  servlet/      — BaseServlet, HomeServlet, LoginServlet, LogoutServlet, AdminDashboardServlet, AdminUsersServlet, ManagerDashboardServlet, ManagerCriteriaServlet, ManagerTeamsServlet, EmployeeDashboardServlet, ErrorServlet, HealthServlet
+  util/         — ConnectionFactory, TransactionManager, SchemaInitializer, Validator, CsrfTokens, CsrfSupport, Flash, FlashMessage, FormParams
 
 src/main/resources/
   db/schema.sql — Idempotent PostgreSQL DDL script
@@ -153,6 +192,12 @@ src/main/webapp/
   WEB-INF/views/
     login.jsp
     error.jsp
+    admin/
+      users.jsp
+    manager/
+      criteria.jsp
+      teams.jsp
+      team-detail.jsp
     admin.jsp
     manager.jsp
     employee.jsp
@@ -165,12 +210,13 @@ src/test/java/com/epes/
   dao/          — BaseDaoTest, UserDaoTest, TeamDaoTest, CriterionDaoTest, EvaluationDaoTest, GoalDaoTest, FeedbackDaoTest
   filter/       — AccessPolicyTest
   model/        — RocketStageTest
-  service/      — BaseServiceTest, ScoreCalculatorTest, GoalProgressRuleTest, AuthServiceTest, UserServiceTest, TeamServiceTest, CriterionServiceTest, EvaluationServiceTest, GoalServiceTest, FeedbackServiceTest, ReportServiceTest
+  service/      — BaseServiceTest, ScoreCalculatorTest, GoalProgressRuleTest, AuthServiceTest, UserServiceTest, TeamServiceTest, CriterionServiceTest, EvaluationServiceTest, GoalServiceTest, FeedbackServiceTest, ReportServiceTest, UserLookupServiceTest
   service/report/ — ReportAggregatorTest
-  util/         — ValidatorTest, TransactionRollbackTest, CsrfTokensTest, FlashTest
+  util/         — ValidatorTest, TransactionRollbackTest, CsrfTokensTest, FlashTest, FormParamsTest
+  SmokeDataCleanupTest.java
 
 db/             — Database documentation & data dictionary (README.md)
-docs/           — College project documentation
+docs/           — College project documentation (including 04-user-guide.md)
 ```
 
 ## Project Status
@@ -179,4 +225,7 @@ docs/           — College project documentation
 - [x] **Phase 1** — Database schema, domain model (OOP), JDBC DAOs, transaction support
 - [x] **Phase 2** — Services, validation, scoring, reports, concurrency
 - [x] **Phase 3** — Authentication, authorization filters, CSRF protection, error handling, dashboard shells
-- [ ] Phase 4 — JSP views, dashboards, Bootstrap 5 UI & charts
+- [x] **Phase 4A** — User admin, evaluation criteria, and team management with member roles
+- [ ] **Phase 4B** — Evaluations, goals, and feedback workflows
+- [ ] **Phase 4C** — Employee views, reporting dashboards, and visual charts
+

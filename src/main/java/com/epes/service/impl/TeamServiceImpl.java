@@ -15,6 +15,7 @@ import com.epes.model.Team;
 import com.epes.model.TeamMember;
 import com.epes.model.User;
 import com.epes.service.TeamService;
+import com.epes.service.UserSummary;
 import com.epes.util.Validator;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link TeamService} managing organizational teams and memberships.
@@ -196,6 +198,21 @@ public class TeamServiceImpl implements TeamService {
             return teamDao.findByManager(actor.getId());
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<UserSummary> listAssignableEmployees(User actor) throws AuthorizationException, DataAccessException {
+        requireManager(actor);
+        List<User> employees = userDao.findByRole(Role.EMPLOYEE);
+        return employees.stream()
+                .filter(User::isActive)
+                .sorted((u1, u2) -> {
+                    String name1 = u1.getFullName() != null ? u1.getFullName() : "";
+                    String name2 = u2.getFullName() != null ? u2.getFullName() : "";
+                    return String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
+                })
+                .map(UserSummary::from)
+                .collect(Collectors.toList());
     }
 
     private void requireManager(User actor) {

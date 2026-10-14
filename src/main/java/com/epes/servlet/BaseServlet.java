@@ -115,7 +115,12 @@ public abstract class BaseServlet extends HttpServlet {
             req.setAttribute(AppConstants.REQ_ERROR_STATUS, HttpServletResponse.SC_FORBIDDEN);
             req.setAttribute(AppConstants.REQ_ERROR_MESSAGE, ex.getMessage());
             req.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(req, resp);
-        } else if (ex instanceof BusinessRuleException || ex instanceof EntityNotFoundException) {
+        } else if (ex instanceof EntityNotFoundException) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            req.setAttribute(AppConstants.REQ_ERROR_STATUS, HttpServletResponse.SC_NOT_FOUND);
+            req.setAttribute(AppConstants.REQ_ERROR_MESSAGE, ex.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(req, resp);
+        } else if (ex instanceof BusinessRuleException) {
             flash(req, FlashMessage.Type.ERROR, ex.getMessage());
         } else {
             throw new ServletException(ex);

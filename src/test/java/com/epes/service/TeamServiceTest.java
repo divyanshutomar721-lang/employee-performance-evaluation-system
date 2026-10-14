@@ -108,4 +108,42 @@ class TeamServiceTest extends BaseServiceTest {
                 appContext.getTeamService().createTeam(manager1, randomTeamName(), "Desc",
                         List.of(manager2.getId()), Map.of()));
     }
+
+    @Test
+    @DisplayName("listAssignableEmployees returns only active employees sorted case-insensitively, restricted to managers")
+    void testListAssignableEmployees() throws Exception {
+        User manager = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Manager Boss", Role.MANAGER, true, null));
+        User empB = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Bob Builder", Role.EMPLOYEE, true, null));
+        User empA = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "alice wonder", Role.EMPLOYEE, true, null));
+        User empInactive = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Charlie Inactive", Role.EMPLOYEE, false, null));
+        User otherManager = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Dan Manager", Role.MANAGER, true, null));
+        User admin = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Super Admin", Role.ADMIN, true, null));
+
+        // Non-managers cannot list assignable employees
+        assertThrows(AuthorizationException.class, () ->
+                appContext.getTeamService().listAssignableEmployees(empA));
+        assertThrows(AuthorizationException.class, () ->
+                appContext.getTeamService().listAssignableEmployees(admin));
+        assertThrows(AuthorizationException.class, () ->
+                appContext.getTeamService().listAssignableEmployees(null));
+
+        List<UserSummary> assignable = appContext.getTeamService().listAssignableEmployees(manager);
+
+        // Find our test employees in the returned list
+        List<UserSummary> testEmployees = assignable.stream()
+                .filter(u -> u.getId().equals(empA.getId()) || u.getId().equals(empB.getId())
+                        || u.getId().equals(empInactive.getId()) || u.getId().equals(otherManager.getId()))
+                .toList();
+
+        assertEquals(2, testEmployees.size());
+        // Verify sorted case-insensitively: alice wonder before Bob Builder
+        assertEquals("alice wonder", testEmployees.get(0).getFullName());
+        assertEquals("Bob Builder", testEmployees.get(1).getFullName());
+    }
 }

@@ -1,6 +1,8 @@
 package com.epes.servlet;
 
 import com.epes.config.AppConstants;
+import com.epes.exception.AuthorizationException;
+import com.epes.exception.EntityNotFoundException;
 import com.epes.exception.ServiceException;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -44,6 +46,12 @@ public class ErrorServlet extends BaseServlet {
 
         int status = (customStatus != null) ? customStatus
                 : ((statusCode != null) ? statusCode : HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        if (throwable instanceof EntityNotFoundException || (throwable != null && throwable.getCause() instanceof EntityNotFoundException)) {
+            status = HttpServletResponse.SC_NOT_FOUND;
+        } else if (throwable instanceof AuthorizationException || (throwable != null && throwable.getCause() instanceof AuthorizationException)) {
+            status = HttpServletResponse.SC_FORBIDDEN;
+        }
 
         if (throwable != null) {
             LOGGER.log(Level.SEVERE, "Handled error with status " + status, throwable);

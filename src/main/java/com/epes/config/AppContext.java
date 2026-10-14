@@ -22,6 +22,7 @@ import com.epes.service.FeedbackService;
 import com.epes.service.GoalService;
 import com.epes.service.ReportService;
 import com.epes.service.TeamService;
+import com.epes.service.UserLookupService;
 import com.epes.service.UserService;
 import com.epes.service.impl.CriterionServiceImpl;
 import com.epes.service.impl.EvaluationServiceImpl;
@@ -30,6 +31,7 @@ import com.epes.service.impl.GoalServiceImpl;
 import com.epes.service.impl.ReportServiceImpl;
 import com.epes.service.impl.TeamServiceImpl;
 import com.epes.service.impl.TemporaryEmailAuthService;
+import com.epes.service.impl.UserLookupServiceImpl;
 import com.epes.service.impl.UserServiceImpl;
 import com.epes.util.ConnectionFactory;
 import com.epes.util.TransactionManager;
@@ -61,6 +63,7 @@ public class AppContext {
     // Services
     private final AuthService authService;
     private final UserService userService;
+    private final UserLookupService userLookupService;
     private final TeamService teamService;
     private final CriterionService criterionService;
     private final EvaluationService evaluationService;
@@ -101,6 +104,7 @@ public class AppContext {
         // Services
         this.authService = new TemporaryEmailAuthService(userDao);
         this.userService = new UserServiceImpl(userDao);
+        this.userLookupService = new UserLookupServiceImpl(userDao);
         this.teamService = new TeamServiceImpl(teamDao, userDao);
         this.criterionService = new CriterionServiceImpl(criterionDao);
         this.evaluationService = new EvaluationServiceImpl(evaluationDao, userDao, teamDao, criterionDao);
@@ -170,6 +174,10 @@ public class AppContext {
 
     public UserService getUserService() {
         return userService;
+    }
+
+    public UserLookupService getUserLookupService() {
+        return userLookupService;
     }
 
     public TeamService getTeamService() {

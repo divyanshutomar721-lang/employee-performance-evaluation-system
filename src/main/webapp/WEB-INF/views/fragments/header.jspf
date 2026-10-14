@@ -39,10 +39,29 @@
                 <div class="collapse navbar-collapse" id="epesNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" href="${pageContext.request.contextPath}/home">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/home">
                                 <i class="bi bi-speedometer2 me-1"></i> Dashboard
                             </a>
                         </li>
+                        <c:if test="${sessionScope.currentUser.role == 'ADMIN'}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/users">
+                                    <i class="bi bi-people me-1"></i> Users
+                                </a>
+                            </li>
+                        </c:if>
+                        <c:if test="${sessionScope.currentUser.role == 'MANAGER'}">
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/manager/criteria">
+                                    <i class="bi bi-sliders me-1"></i> Criteria
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/manager/teams">
+                                    <i class="bi bi-diagram-3 me-1"></i> Teams
+                                </a>
+                            </li>
+                        </c:if>
                     </ul>
                     <div class="d-flex align-items-center gap-3 text-light">
                         <div class="d-flex align-items-center gap-2">
@@ -82,4 +101,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </c:forEach>
+        </c:if>
+        <c:if test="${not empty validationErrors}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    <c:forEach items="${validationErrors}" var="err">
+                        <li><c:out value="${err}"/></li>
+                    </c:forEach>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </c:if>
