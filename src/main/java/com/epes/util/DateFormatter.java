@@ -49,4 +49,17 @@ public final class DateFormatter {
         }
         return DATE_TIME_FMT.format(temporal);
     }
+
+    /**
+     * Formats a {@link Number} with 2 decimal places using US locale (e.g. "88.00").
+     *
+     * @param number number, may be null
+     * @return formatted decimal string, or "-" if null
+     */
+    public static String formatDecimal(Number number) {
+        if (number == null) {
+            return "-";
+        }
+        return String.format(Locale.US, "%.2f", number.doubleValue());
+    }
 }

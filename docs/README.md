@@ -11,9 +11,10 @@
 | 1 | [Requirement Analysis](01-requirement-analysis.md) | Problem statement, scope, roles, functional requirements with input and output, business rules, Rocket Stage rating model, non-functional requirements, traceability |
 | 2 | [Design Diagrams](02-design-diagrams.md) | Use case, architecture, ER, class diagrams, sequence diagrams, state diagram, flow chart |
 | 3 | [Solution Design and Logical Plan](03-solution-design.md) | Layers, packages, patterns, Java concepts used, database and transaction design, security, threads, phase plan, rubric mapping |
-| 4 | [User Guide (Phase 4A)](04-user-guide.md) | Admin user management, manager criteria, manager teams and members |
-| 5 | [Database Dictionary](../db/README.md) | Every table, column, key and relationship |
-| 6 | [Project README](../README.md) | Setup, run, test commands |
+| 4 | [User Guide](04-user-guide.md) | Admin user management, manager workflows, employee dashboards, and reports |
+| 5 | [Testing Summary](05-testing-summary.md) | Test class directory by layer, execution metrics, database isolation policy, and live smoke test scenarios |
+| 6 | [Database Dictionary](../db/README.md) | Every table, column, key and relationship |
+| 7 | [Project README](../README.md) | Setup, run, test commands |
 
 The diagrams use Mermaid, so GitHub shows them directly in the browser.
 

@@ -23,4 +23,11 @@
         <function-class>com.epes.util.DateFormatter</function-class>
         <function-signature>java.lang.String formatDateTime(java.time.temporal.TemporalAccessor)</function-signature>
     </function>
+
+    <function>
+        <description>Formats a Number with two decimal places (e.g. '88.00')</description>
+        <name>formatDecimal</name>
+        <function-class>com.epes.util.DateFormatter</function-class>
+        <function-signature>java.lang.String formatDecimal(java.lang.Number)</function-signature>
+    </function>
 </taglib>

@@ -12,11 +12,8 @@
     <meta name="description"
           content="Employee Performance Evaluation System — track goals, feedback and performance reviews.">
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YcnS/1DYZb5BjAo60FmBJLPic4G8gYTLfGn"
-          crossorigin="anonymous">
+    <!-- Bootstrap 5 CSS (Local) -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/vendor/bootstrap.min.css">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
           rel="stylesheet">
@@ -180,9 +177,7 @@
     &copy; 2026 EPES &mdash; College Project
 </footer>
 
-<!-- Bootstrap 5 JS bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+<!-- Bootstrap 5 JS bundle (Local) -->
+<script src="${pageContext.request.contextPath}/assets/vendor/bootstrap.bundle.min.js"></script>
 </body>
 </html>

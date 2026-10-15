@@ -106,4 +106,37 @@ class ReportAggregatorTest {
         fb2.setRating(4);
         assertEquals(4.50, ReportAggregator.calculateAverageFeedbackRating(List.of(fb1, fb2)));
     }
+
+    @Test
+    @DisplayName("Average rating by criterion sorted case-insensitively and rounded to 2 decimals")
+    void testAverageRatingByCriterion() {
+        assertTrue(ReportAggregator.averageRatingByCriterion(null).isEmpty());
+        assertTrue(ReportAggregator.averageRatingByCriterion(List.of()).isEmpty());
+
+        com.epes.model.EvaluationScore s1 = new com.epes.model.EvaluationScore(1L, 10L, 100L, "Quality", 50, 4, "Good");
+        com.epes.model.EvaluationScore s2 = new com.epes.model.EvaluationScore(2L, 10L, 101L, "communication", 50, 3, "OK");
+
+        com.epes.model.EvaluationScore s3 = new com.epes.model.EvaluationScore(3L, 11L, 100L, "quality", 50, 5, "Great");
+        com.epes.model.EvaluationScore s4 = new com.epes.model.EvaluationScore(4L, 11L, 101L, "Communication", 50, 4, "Better");
+
+        Evaluation e1 = new Evaluation();
+        e1.setScores(List.of(s1, s2));
+
+        Evaluation e2 = new Evaluation();
+        e2.setScores(List.of(s3, s4));
+
+        java.util.LinkedHashMap<String, Double> result = ReportAggregator.averageRatingByCriterion(List.of(e1, e2));
+        assertEquals(2, result.size());
+
+        // Sorted case-insensitively: "Communication" comes before "Quality"
+        List<String> keys = new java.util.ArrayList<>(result.keySet());
+        assertEquals("communication", keys.get(0).toLowerCase());
+        assertEquals("quality", keys.get(1).toLowerCase());
+
+        // Communication: (3 + 4) / 2 = 3.50
+        assertEquals(3.50, result.get(keys.get(0)));
+        // Quality: (4 + 5) / 2 = 4.50
+        assertEquals(4.50, result.get(keys.get(1)));
+    }
 }
+

@@ -26,14 +26,27 @@ public class EmployeeReport {
     private final Map<GoalStatus, Long> goalCounts;
     private final double averageFeedbackRating;
     private final int feedbackCount;
+    private final Map<String, Double> averageRatingByCriterion;
 
     /**
-     * Constructs an EmployeeReport.
+     * Constructs an EmployeeReport (legacy 11-parameter overload).
      */
     public EmployeeReport(User employee, List<Evaluation> evaluations, List<String> chartLabels,
                           List<Double> chartScores, double averageScore, double latestScore,
                           RocketStage latestStage, Trend trend, Map<GoalStatus, Long> goalCounts,
                           double averageFeedbackRating, int feedbackCount) {
+        this(employee, evaluations, chartLabels, chartScores, averageScore, latestScore,
+                latestStage, trend, goalCounts, averageFeedbackRating, feedbackCount, Collections.emptyMap());
+    }
+
+    /**
+     * Constructs an EmployeeReport with criterion averages.
+     */
+    public EmployeeReport(User employee, List<Evaluation> evaluations, List<String> chartLabels,
+                          List<Double> chartScores, double averageScore, double latestScore,
+                          RocketStage latestStage, Trend trend, Map<GoalStatus, Long> goalCounts,
+                          double averageFeedbackRating, int feedbackCount,
+                          Map<String, Double> averageRatingByCriterion) {
         this.employee = employee;
         this.evaluations = evaluations != null ? Collections.unmodifiableList(evaluations) : Collections.emptyList();
         this.chartLabels = chartLabels != null ? Collections.unmodifiableList(chartLabels) : Collections.emptyList();
@@ -45,7 +58,11 @@ public class EmployeeReport {
         this.goalCounts = goalCounts != null ? Collections.unmodifiableMap(new EnumMap<>(goalCounts)) : Collections.emptyMap();
         this.averageFeedbackRating = averageFeedbackRating;
         this.feedbackCount = feedbackCount;
+        this.averageRatingByCriterion = averageRatingByCriterion != null
+                ? Collections.unmodifiableMap(new java.util.LinkedHashMap<>(averageRatingByCriterion))
+                : Collections.emptyMap();
     }
+
 
     public User getEmployee() {
         return employee;
@@ -90,4 +107,9 @@ public class EmployeeReport {
     public int getFeedbackCount() {
         return feedbackCount;
     }
+
+    public Map<String, Double> getAverageRatingByCriterion() {
+        return averageRatingByCriterion;
+    }
 }
+

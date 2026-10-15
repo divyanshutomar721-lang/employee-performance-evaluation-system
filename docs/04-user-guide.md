@@ -178,3 +178,57 @@ Managers provide continuous qualitative 360 feedback and ratings outside formal 
 1. In the **Feedback Given Roster**, review all feedback you have submitted, along with recipient, rating badge, linked evaluation period, and submission date.
 2. To remove a feedback entry, click the **Delete** (trash) icon and confirm the prompt.
 
+---
+
+## Employee: Dashboard and Progress Chart
+
+1. Log in with your employee email. You will land directly on `/employee/dashboard`.
+2. Inspect the top KPI cards: current Rocket Stage badge, latest review score, trajectory trend (Improving, Stable, Declining), and goal status counts.
+3. Review the **Performance Score Progression** line chart visualizing score evolution across review cycles (scaled 0 to 100).
+4. Review recent feedback submitted by managers in the right-hand panel.
+5. Use quick navigation cards to jump directly to Performance, Feedback, Goals, or Reports.
+
+---
+
+## Employee: Feedback History
+
+1. In the top navigation bar, click **Feedback** (or navigate to `/employee/feedback`).
+2. Review the **Average Feedback Rating** KPI card at the top.
+3. In the feedback history table, review each review entry: manager name, numerical rating (1 to 5) with Rocket Stage tier label, qualitative feedback comments, linked evaluation period, and timestamp.
+
+---
+
+## Employee: Goals
+
+1. In the top navigation bar, click **Goals** (or navigate to `/employee/goals`).
+2. Review the goal list showing both personal goals and manager-assigned goals.
+3. **Create a personal goal**: In the *Create Personal Goal* card, enter a description and choose a target date today or in the future. Click **Create Goal**.
+4. **Update progress**: For any goal (personal or assigned), enter a new percentage (0 to 100) in the progress field and click **Update**.
+5. **Edit or delete personal goals**: Click **Edit** or **Delete** on your personal goals. Note that manager-assigned goals cannot be edited or deleted by employees.
+
+---
+
+## Employee: Reports and Printing
+
+1. In the top navigation bar, click **Reports** (or navigate to `/employee/reports`).
+2. Review the 6 summary KPI cards: Average Score, Latest Score, Current Stage, Trajectory, Total Evaluations, and Feedback Average.
+3. Examine the 3 visual analytics charts:
+   - **Performance Score Progression** line chart (0 to 100)
+   - **Goal Status Breakdown** doughnut chart
+   - **Average Rating per Criterion** bar chart (0 to 5)
+4. Below the criterion chart, view the table of average ratings per criterion across all your evaluation cycles.
+5. Click **Print this page** to generate a clean physical printout or PDF report with navigation and buttons automatically hidden.
+
+---
+
+## Manager: Reports
+
+1. In the manager navigation bar, click **Reports** (or navigate to `/manager/reports`).
+2. Review the manager overview cards: managed team count, distinct employee count, and composite team average score.
+3. In the Managed Teams table, click **Open report** on any team to navigate to `/manager/reports/team?id=N`.
+4. On the Team Report page:
+   - Review the team's average performance score and the **Rocket Stage Distribution** bar chart.
+   - Inspect the ranked team members table sorted by average score (un-evaluated members listed last).
+5. Click **Employee report** next to any team member to open the employee drilldown report (`/manager/reports/employee?id=N`) with longitudinal charts and criterion breakdown.
+6. Click **Print Report** on any report view for a printer-optimized printout.
+

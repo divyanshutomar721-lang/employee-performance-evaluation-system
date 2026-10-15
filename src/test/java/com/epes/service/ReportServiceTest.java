@@ -68,7 +68,11 @@ class ReportServiceTest extends BaseServiceTest {
         assertEquals(Trend.IMPROVING, report.getTrend());
         assertEquals(1, report.getFeedbackCount());
         assertEquals(4.00, report.getAverageFeedbackRating());
+        assertNotNull(report.getAverageRatingByCriterion());
+        assertEquals(1, report.getAverageRatingByCriterion().size());
+        assertEquals(3.50, report.getAverageRatingByCriterion().get("Skill"));
     }
+
 
     @Test
     @DisplayName("Build team report with sorted employee summaries and stage distribution")

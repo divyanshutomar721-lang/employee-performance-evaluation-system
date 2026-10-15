@@ -12,7 +12,7 @@ Employees track their progress, view feedback, set personal goals and view their
 | Build      | Apache Maven (WAR packaging)                          |
 | Web        | Jakarta Servlet 6.0, JSP, JSTL (Tomcat 10.1)         |
 | Database   | PostgreSQL (plain JDBC, DAO pattern, transactions)    |
-| Frontend   | JSP + Bootstrap 5 (CDN) + Bootstrap Icons + CSS3      |
+| Frontend   | JSP + Bootstrap 5.3.3 (local) + Chart.js 4.4.7 (local) + CSS3 |
 | Logging    | `java.util.logging`                                   |
 | Testing    | JUnit 5 (Jupiter), Maven Surefire                     |
 
@@ -110,10 +110,22 @@ The application enforces a multi-layered defence-in-depth architecture across fi
 | `/manager/feedback` | GET | `MANAGER` | Table of feedback given and Give feedback form |
 | `/manager/feedback/create` | POST | `MANAGER` | Submits continuous feedback with 1..5 rating |
 | `/manager/feedback/delete` | POST | `MANAGER` | Deletes a feedback record |
-| `/employee/dashboard` | GET | `EMPLOYEE` | Employee dashboard shell & performance rocket stage |
+| `/manager/reports` | GET | `MANAGER` | Manager overview of managed teams, member counts, and averages |
+| `/manager/reports/team` | GET | `MANAGER` | Team report with stage distribution chart and ranked members table |
+| `/manager/reports/employee` | GET | `MANAGER` | Employee performance report drilldown for supervised team members |
+| `/employee/dashboard` | GET | `EMPLOYEE` | Employee dashboard with Rocket Stage, latest score, trend, and progress chart |
+| `/employee/performance` | GET | `EMPLOYEE` | Longitudinal score progression chart, latest review ratings bar chart, evaluation table |
+| `/employee/evaluations/view` | GET | `EMPLOYEE` | Read-only evaluation detail view with score snapshots and stage badge |
+| `/employee/feedback` | GET | `EMPLOYEE` | Feedback history table with manager names, stage labels, and average rating |
+| `/employee/goals` | GET | `EMPLOYEE` | Goals tracker for personal & assigned goals with progress updating |
+| `/employee/goals/create` | POST | `EMPLOYEE` | Creates a personal development goal |
+| `/employee/goals/progress` | POST | `EMPLOYEE` | Updates progress percentage on personal or assigned goals |
+| `/employee/goals/edit` | POST | `EMPLOYEE` | Edits description and target date of personal goals |
+| `/employee/goals/delete` | POST | `EMPLOYEE` | Deletes a personal goal |
+| `/employee/reports` | GET | `EMPLOYEE` | Self-assessment report with 6 KPI cards, 3 visual charts, and print stylesheet |
 | `/health` | GET | Anonymous / Any | Health check confirming database connectivity |
 | `/error` | GET, POST | Anonymous / Any | Central error handler rendering safe error views |
-| `/assets/*` | GET | Anonymous / Any | Static CSS and JavaScript assets |
+| `/assets/*` | GET | Anonymous / Any | Static CSS and JavaScript assets (including local vendor bundles) |
 
 ## Service Layer and Business Rules
 
@@ -244,6 +256,9 @@ db/             — Database documentation & data dictionary (README.md)
 docs/           — College project documentation (including 04-user-guide.md)
 ```
 
+## Charts
+Visual analytics across employee and manager dashboards are rendered using [Chart.js](https://www.chartjs.org/) (v4.4.7 UMD bundle), bundled locally under `/assets/vendor/chart.umd.js` for self-contained, offline deployment. Charts are initialized declaratively via HTML data attributes (`<canvas data-chart="...">`) produced by the pure utility `ChartJson`, ensuring complete escaping of control characters, quotes, and HTML tags without inline script injection. Chart colors align with EPES Rocket Stage branding (Launchpad Grey, Liftoff Blue, Orbit Teal, Cruise Green, Summit Gold).
+
 ## Project Status
 
 - [x] **Phase 0** — Maven WAR skeleton, config, health check
@@ -252,5 +267,5 @@ docs/           — College project documentation (including 04-user-guide.md)
 - [x] **Phase 3** — Authentication, authorization filters, CSRF protection, error handling, dashboard shells
 - [x] **Phase 4A** — User admin, evaluation criteria, and team management with member roles
 - [x] **Phase 4B** — Manager evaluations with Rocket Stage scoring, goals, and feedback workflows
-- [ ] **Phase 4C** — Employee views, reporting dashboards, and visual charts
+- [x] **Phase 4C** — Employee views, reporting dashboards, and visual charts
 

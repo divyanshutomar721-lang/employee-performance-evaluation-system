@@ -42,4 +42,14 @@ class DateFormatterTest {
     void testFormatDateTimeNull() {
         assertEquals("-", DateFormatter.formatDateTime(null));
     }
+
+    @Test
+    @DisplayName("formatDecimal formats number to two decimal places")
+    void testFormatDecimal() {
+        assertEquals("88.00", DateFormatter.formatDecimal(88.0));
+        assertEquals("48.50", DateFormatter.formatDecimal(48.5));
+        assertEquals("3.14", DateFormatter.formatDecimal(3.14159));
+        assertEquals("0.00", DateFormatter.formatDecimal(0));
+        assertEquals("-", DateFormatter.formatDecimal(null));
+    }
 }

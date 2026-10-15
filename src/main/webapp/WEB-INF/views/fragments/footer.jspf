@@ -7,9 +7,13 @@
     </div>
 </footer>
 
-<!-- Bootstrap 5 JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+<!-- Bootstrap 5 JS Bundle (Local) -->
+<script src="${pageContext.request.contextPath}/assets/vendor/bootstrap.bundle.min.js"></script>
+
+<!-- Conditional Chart.js and chart initializers -->
+<c:if test="${needsCharts}">
+    <script src="${pageContext.request.contextPath}/assets/vendor/chart.umd.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/charts.js"></script>
+</c:if>
 </body>
 </html>

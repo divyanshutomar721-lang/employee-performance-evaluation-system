@@ -113,6 +113,14 @@ public class ReportServiceImpl implements ReportService {
                 : RocketStage.LAUNCHPAD;
         Trend trend = ReportAggregator.calculateTrend(evals);
 
+        // Populate scores on each evaluation if not already loaded
+        for (Evaluation e : evals) {
+            if (e.getScores() == null || e.getScores().isEmpty()) {
+                e.setScores(evaluationDao.findScoresByEvaluationId(e.getId()));
+            }
+        }
+        Map<String, Double> averageRatingByCriterion = ReportAggregator.averageRatingByCriterion(evals);
+
         List<Goal> goals = goalDao.findByEmployee(employeeId);
         Map<GoalStatus, Long> goalCounts = ReportAggregator.calculateGoalCounts(goals);
 
@@ -131,7 +139,8 @@ public class ReportServiceImpl implements ReportService {
                 trend,
                 goalCounts,
                 averageFeedbackRating,
-                feedbackCount
+                feedbackCount,
+                averageRatingByCriterion
         );
     }
 
@@ -168,22 +177,26 @@ public class ReportServiceImpl implements ReportService {
 
             List<Evaluation> empEvals = evaluationDao.findByEmployee(empId);
             double empAvg = ReportAggregator.calculateAverageScore(empEvals);
-            RocketStage latestStage = !empEvals.isEmpty() ? empEvals.get(0).getOverallStage() : RocketStage.LAUNCHPAD;
+            RocketStage latestStage = !empEvals.isEmpty() ? empEvals.get(0).getOverallStage() : null;
 
             List<Goal> empGoals = goalDao.findByEmployee(empId);
             int goalCompletion = ReportAggregator.calculateGoalCompletionPercent(empGoals);
 
-            rows.add(new EmployeeSummaryRow(empId, empName, empAvg, latestStage, goalCompletion));
-            memberLatestStages.add(latestStage);
+            rows.add(new EmployeeSummaryRow(empId, empName, empAvg, latestStage != null ? latestStage : RocketStage.LAUNCHPAD, goalCompletion, empEvals.size()));
 
             if (!empEvals.isEmpty()) {
+                memberLatestStages.add(latestStage);
                 totalMemberAvgSum += empAvg;
                 evaluatedMemberCount++;
             }
         }
 
-        // Sort rows by average score descending
-        rows.sort(Comparator.comparingDouble(EmployeeSummaryRow::getAverageScore).reversed());
+        // Sort rows: employees with evaluations first (ordered descending by average score), un-evaluated employees last
+        rows.sort((a, b) -> {
+            if (a.hasEvaluations() && !b.hasEvaluations()) return -1;
+            if (!a.hasEvaluations() && b.hasEvaluations()) return 1;
+            return Double.compare(b.getAverageScore(), a.getAverageScore());
+        });
 
         Map<RocketStage, Long> stageDistribution = ReportAggregator.buildStageDistribution(memberLatestStages);
         double teamAverage = evaluatedMemberCount > 0

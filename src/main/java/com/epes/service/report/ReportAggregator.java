@@ -1,6 +1,7 @@
 package com.epes.service.report;
 
 import com.epes.model.Evaluation;
+import com.epes.model.EvaluationScore;
 import com.epes.model.Feedback;
 import com.epes.model.Goal;
 import com.epes.model.GoalStatus;
@@ -8,9 +9,12 @@ import com.epes.model.RocketStage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Pure calculation and aggregation helper methods for reporting and data analytics.
@@ -21,6 +25,50 @@ public final class ReportAggregator {
     private ReportAggregator() {
         // Pure utility class
     }
+
+    /**
+     * Averages the rating of EvaluationScore rows grouped by criterionName (snapshot names)
+     * across all given evaluations, each average rounded to 2 decimals, map sorted by name (case-insensitive).
+     * Empty input gives an empty map.
+     *
+     * @param evaluations list of evaluations with populated scores
+     * @return LinkedHashMap of criterion name to average rating (sorted case-insensitively)
+     */
+    public static LinkedHashMap<String, Double> averageRatingByCriterion(List<Evaluation> evaluations) {
+        LinkedHashMap<String, Double> result = new LinkedHashMap<>();
+        if (evaluations == null || evaluations.isEmpty()) {
+            return result;
+        }
+
+        Map<String, List<Integer>> grouped = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (Evaluation eval : evaluations) {
+            if (eval != null && eval.getScores() != null) {
+                for (EvaluationScore score : eval.getScores()) {
+                    if (score != null && score.getCriterionName() != null && !score.getCriterionName().trim().isEmpty()) {
+                        String name = score.getCriterionName().trim();
+                        grouped.computeIfAbsent(name, k -> new ArrayList<>()).add(score.getRating());
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<String, List<Integer>> entry : grouped.entrySet()) {
+            List<Integer> ratings = entry.getValue();
+            if (!ratings.isEmpty()) {
+                double sum = 0.0;
+                for (int r : ratings) {
+                    sum += r;
+                }
+                double avg = BigDecimal.valueOf(sum / ratings.size())
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue();
+                result.put(entry.getKey(), avg);
+            }
+        }
+
+        return result;
+    }
+
 
     /**
      * Calculates the arithmetic mean overall score across a list of evaluations.

@@ -84,27 +84,53 @@
         </div>
     </div>
 
-    <!-- Performance Reports (Disabled - Phase 4C) -->
+    <!-- Performance Reports (Enabled) -->
     <div class="col-12 col-md-6 col-lg-4">
-        <div class="card epes-card disabled-feature h-100 p-3">
+        <div class="card epes-card h-100 p-3 shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="fs-3 text-secondary">
-                        <i class="bi bi-graph-up-arrow"></i>
+                    <div class="fs-3 text-warning">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
                     </div>
-                    <span class="badge bg-light text-muted border">Coming in Phase 4C</span>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                        Analytics
+                    </span>
                 </div>
                 <h2 class="h5 fw-bold card-title">Performance Reports</h2>
-                <p class="card-text text-muted small">
-                    View team score distributions, stage velocity, and export asynchronous CSV/PDF summary reports.
+                <p class="card-text text-muted small mb-3">
+                    View team score distributions, stage velocity, and individual employee analytics.
                 </p>
+                <div class="small text-muted bg-light p-2 rounded mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Team Rollups</span>
+                        <span class="text-primary fw-semibold">Stage Velocity</span>
+                    </div>
+                </div>
             </div>
             <div class="card-footer bg-transparent border-0 pt-0">
-                <button class="btn btn-sm btn-outline-secondary w-100 disabled" disabled>View Reports</button>
+                <a href="${pageContext.request.contextPath}/manager/reports" class="btn btn-sm btn-warning text-dark w-100">
+                    <i class="bi bi-arrow-right-circle me-1"></i> View Reports
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+<c:if test="${not empty stageChartJson}">
+    <div class="card epes-card shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+            <h2 class="h5 fw-bold mb-0">
+                <i class="bi bi-bar-chart-line text-info me-2"></i>Overall Team Stage Distribution
+            </h2>
+        </div>
+        <div class="card-body" style="min-height: 240px;">
+            <div style="height: 200px; position: relative;">
+                <canvas id="managerOverviewStageChart" data-chart="<c:out value='${stageChartJson}'/>"></canvas>
+            </div>
+        </div>
+    </div>
+</c:if>
+
 
 <!-- Section 1: Performance Evaluation -->
 <div class="card epes-card shadow-sm mb-4">
