@@ -146,4 +146,53 @@ class TeamServiceTest extends BaseServiceTest {
         assertEquals("alice wonder", testEmployees.get(0).getFullName());
         assertEquals("Bob Builder", testEmployees.get(1).getFullName());
     }
+
+    @Test
+    @DisplayName("listMyEmployees returns distinct active employees across manager's teams sorted case-insensitively")
+    void testListMyEmployees() throws Exception {
+        User manager1 = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Manager One", Role.MANAGER, true, null));
+        User manager2 = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Manager Two", Role.MANAGER, true, null));
+
+        User empB = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Bob Dev", Role.EMPLOYEE, true, null));
+        User empA = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "alice engineer", Role.EMPLOYEE, true, null));
+        User empC = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Charlie QA", Role.EMPLOYEE, true, null));
+        User empOther = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Dave Other", Role.EMPLOYEE, true, null));
+        User empInactive = appContext.getUserDao().create(UserFactory.create(
+                null, randomEmail(), "Eva Inactive", Role.EMPLOYEE, false, null));
+
+        // Team 1: empA and empB
+        appContext.getTeamService().createTeam(manager1, randomTeamName(), "Team 1",
+                List.of(empA.getId(), empB.getId()), Map.of());
+
+        // Team 2: empB and empC (empB is in both teams, must be distinct!)
+        appContext.getTeamService().createTeam(manager1, randomTeamName(), "Team 2",
+                List.of(empB.getId(), empC.getId()), Map.of());
+
+        // Team 3 (Manager 2): empOther
+        appContext.getTeamService().createTeam(manager2, randomTeamName(), "Team 3",
+                List.of(empOther.getId()), Map.of());
+
+        // Non-managers cannot call listMyEmployees
+        assertThrows(AuthorizationException.class, () -> appContext.getTeamService().listMyEmployees(empA));
+        assertThrows(AuthorizationException.class, () -> appContext.getTeamService().listMyEmployees(null));
+
+        List<UserSummary> myEmployees = appContext.getTeamService().listMyEmployees(manager1);
+
+        assertEquals(3, myEmployees.size());
+        // Verify sorted case-insensitively: alice engineer, Bob Dev, Charlie QA
+        assertEquals("alice engineer", myEmployees.get(0).getFullName());
+        assertEquals("Bob Dev", myEmployees.get(1).getFullName());
+        assertEquals("Charlie QA", myEmployees.get(2).getFullName());
+
+        // Manager 2 sees only empOther
+        List<UserSummary> m2Employees = appContext.getTeamService().listMyEmployees(manager2);
+        assertEquals(1, m2Employees.size());
+        assertEquals(empOther.getId(), m2Employees.get(0).getId());
+    }
 }

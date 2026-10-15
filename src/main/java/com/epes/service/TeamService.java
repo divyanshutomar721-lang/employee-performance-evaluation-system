@@ -86,4 +86,15 @@ public interface TeamService {
      * @throws DataAccessException    if a database error occurs
      */
     List<UserSummary> listAssignableEmployees(User actor) throws AuthorizationException, DataAccessException;
+
+    /**
+     * Lists distinct active employees who are members of any team managed by the actor.
+     * Restricted to managers.
+     *
+     * @param actor authenticated manager
+     * @return list of distinct active employee summaries sorted by full name case-insensitively
+     * @throws AuthorizationException if actor is not a manager
+     * @throws DataAccessException    if a database error occurs
+     */
+    List<UserSummary> listMyEmployees(User actor) throws AuthorizationException, DataAccessException;
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="https://jakarta.ee/xml/ns/jakartaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-jsptaglibrary_3_0.xsd"
+        version="3.0">
+
+    <description>EPES Custom EL Formatting Functions</description>
+    <display-name>EPES Format Functions</display-name>
+    <tlib-version>1.0</tlib-version>
+    <short-name>epesFmt</short-name>
+    <uri>http://epes.com/tags/format</uri>
+
+    <function>
+        <description>Formats a LocalDate or LocalDateTime as 'dd MMM yyyy'</description>
+        <name>formatDate</name>
+        <function-class>com.epes.util.DateFormatter</function-class>
+        <function-signature>java.lang.String formatDate(java.time.temporal.TemporalAccessor)</function-signature>
+    </function>
+
+    <function>
+        <description>Formats a LocalDateTime as 'dd MMM yyyy HH:mm'</description>
+        <name>formatDateTime</name>
+        <function-class>com.epes.util.DateFormatter</function-class>
+        <function-signature>java.lang.String formatDateTime(java.time.temporal.TemporalAccessor)</function-signature>
+    </function>
+</taglib>

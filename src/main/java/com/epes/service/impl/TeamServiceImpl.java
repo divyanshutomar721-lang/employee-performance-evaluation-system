@@ -21,9 +21,11 @@ import com.epes.util.Validator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -213,6 +215,38 @@ public class TeamServiceImpl implements TeamService {
                 })
                 .map(UserSummary::from)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserSummary> listMyEmployees(User actor) throws AuthorizationException, DataAccessException {
+        requireManager(actor);
+        List<Team> teams = teamDao.findByManager(actor.getId());
+        Set<Long> employeeIds = new HashSet<>();
+        for (Team team : teams) {
+            List<TeamMember> members = teamDao.findMembers(team.getId());
+            for (TeamMember member : members) {
+                employeeIds.add(member.getEmployeeId());
+            }
+        }
+        if (employeeIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<UserSummary> result = new ArrayList<>();
+        for (Long empId : employeeIds) {
+            Optional<User> opt = userDao.findById(empId);
+            if (opt.isPresent()) {
+                User u = opt.get();
+                if (u.isActive() && u.getRole() == Role.EMPLOYEE) {
+                    result.add(UserSummary.from(u));
+                }
+            }
+        }
+        result.sort((u1, u2) -> {
+            String name1 = u1.getFullName() != null ? u1.getFullName() : "";
+            String name2 = u2.getFullName() != null ? u2.getFullName() : "";
+            return String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
+        });
+        return result;
     }
 
     private void requireManager(User actor) {

@@ -53,6 +53,27 @@ public class SmokeDataCleanupTest {
                     assertEquals(0L, rs.getLong(1), "Expected 0 teams with smoke/test name");
                 }
             }
+
+            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM evaluations WHERE period_label LIKE 'T-%'")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    assertEquals(0L, rs.getLong(1), "Expected 0 evaluations with test period label");
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM goals WHERE description LIKE '%Smoke%' OR description LIKE '%test%'")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    assertEquals(0L, rs.getLong(1), "Expected 0 goals with smoke/test description");
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM feedback WHERE comments LIKE '%Smoke%' OR comments LIKE '%test%'")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    assertEquals(0L, rs.getLong(1), "Expected 0 feedback with smoke/test comments");
+                }
+            }
         }
     }
 

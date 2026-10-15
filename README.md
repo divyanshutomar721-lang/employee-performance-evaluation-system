@@ -97,6 +97,19 @@ The application enforces a multi-layered defence-in-depth architecture across fi
 | `/manager/teams/members/add` | POST | `MANAGER` | Adds an active employee to a team |
 | `/manager/teams/members/role` | POST | `MANAGER` | Updates a member's role in a team |
 | `/manager/teams/members/remove`| POST | `MANAGER` | Removes a member from a team |
+| `/manager/evaluations` | GET | `MANAGER` | Table of manager's evaluations and New evaluation button |
+| `/manager/evaluations/new` | GET | `MANAGER` | Evaluation form with employee select, criteria ratings, and live score preview |
+| `/manager/evaluations/create` | POST | `MANAGER` | Creates evaluation with score snapshots and calculates Rocket Stage |
+| `/manager/evaluations/view` | GET | `MANAGER` | Evaluation detail view showing snapshot scores, stage badge, and delete button |
+| `/manager/evaluations/delete` | POST | `MANAGER` | Deletes an evaluation |
+| `/manager/goals` | GET | `MANAGER` | Table of assigned goals with progress update, inline edit, and assign form |
+| `/manager/goals/assign` | POST | `MANAGER` | Assigns goal to an employee with future target date |
+| `/manager/goals/progress` | POST | `MANAGER` | Updates progress percentage with automatic status mapping |
+| `/manager/goals/edit` | POST | `MANAGER` | Edits goal description and target date |
+| `/manager/goals/delete` | POST | `MANAGER` | Deletes an assigned goal |
+| `/manager/feedback` | GET | `MANAGER` | Table of feedback given and Give feedback form |
+| `/manager/feedback/create` | POST | `MANAGER` | Submits continuous feedback with 1..5 rating |
+| `/manager/feedback/delete` | POST | `MANAGER` | Deletes a feedback record |
 | `/employee/dashboard` | GET | `EMPLOYEE` | Employee dashboard shell & performance rocket stage |
 | `/health` | GET | Anonymous / Any | Health check confirming database connectivity |
 | `/error` | GET, POST | Anonymous / Any | Central error handler rendering safe error views |
@@ -179,16 +192,23 @@ src/main/java/com/epes/
   service/      — Service interfaces (UserService, TeamService, CriterionService, EvaluationService, GoalService, FeedbackService, ReportService, UserLookupService, UserSummary), ScoreCalculator, GoalProgressRule
   service/impl/ — Service implementations (including UserLookupServiceImpl)
   service/report/ — EmployeeReport, TeamReport, ManagerOverview, ReportAggregator, Trend
-  servlet/      — BaseServlet, HomeServlet, LoginServlet, LogoutServlet, AdminDashboardServlet, AdminUsersServlet, ManagerDashboardServlet, ManagerCriteriaServlet, ManagerTeamsServlet, EmployeeDashboardServlet, ErrorServlet, HealthServlet
-  util/         — ConnectionFactory, TransactionManager, SchemaInitializer, Validator, CsrfTokens, CsrfSupport, Flash, FlashMessage, FormParams
+  servlet/      — BaseServlet, HomeServlet, LoginServlet, LogoutServlet, AdminDashboardServlet, AdminUsersServlet, ManagerDashboardServlet, ManagerCriteriaServlet, ManagerTeamsServlet, ManagerEvaluationsServlet, ManagerGoalsServlet, ManagerFeedbackServlet, EmployeeDashboardServlet, ErrorServlet, HealthServlet
+  util/         — ConnectionFactory, TransactionManager, SchemaInitializer, Validator, CsrfTokens, CsrfSupport, Flash, FlashMessage, FormParams, DateFormatter, EvaluationFormParser
 
 src/main/resources/
   db/schema.sql — Idempotent PostgreSQL DDL script
 
 src/main/webapp/
   index.jsp
-  assets/css/style.css
+  assets/
+    css/style.css
+    js/evaluation-form.js
   WEB-INF/web.xml
+  WEB-INF/tags/
+    stageBadge.tag
+    statusBadge.tag
+  WEB-INF/tlds/
+    format.tld
   WEB-INF/views/
     login.jsp
     error.jsp
@@ -198,6 +218,11 @@ src/main/webapp/
       criteria.jsp
       teams.jsp
       team-detail.jsp
+      evaluations.jsp
+      evaluation-form.jsp
+      evaluation-detail.jsp
+      goals.jsp
+      feedback.jsp
     admin.jsp
     manager.jsp
     employee.jsp
@@ -212,7 +237,7 @@ src/test/java/com/epes/
   model/        — RocketStageTest
   service/      — BaseServiceTest, ScoreCalculatorTest, GoalProgressRuleTest, AuthServiceTest, UserServiceTest, TeamServiceTest, CriterionServiceTest, EvaluationServiceTest, GoalServiceTest, FeedbackServiceTest, ReportServiceTest, UserLookupServiceTest
   service/report/ — ReportAggregatorTest
-  util/         — ValidatorTest, TransactionRollbackTest, CsrfTokensTest, FlashTest, FormParamsTest
+  util/         — ValidatorTest, TransactionRollbackTest, CsrfTokensTest, FlashTest, FormParamsTest, DateFormatterTest, EvaluationFormParserTest
   SmokeDataCleanupTest.java
 
 db/             — Database documentation & data dictionary (README.md)
@@ -226,6 +251,6 @@ docs/           — College project documentation (including 04-user-guide.md)
 - [x] **Phase 2** — Services, validation, scoring, reports, concurrency
 - [x] **Phase 3** — Authentication, authorization filters, CSRF protection, error handling, dashboard shells
 - [x] **Phase 4A** — User admin, evaluation criteria, and team management with member roles
-- [ ] **Phase 4B** — Evaluations, goals, and feedback workflows
+- [x] **Phase 4B** — Manager evaluations with Rocket Stage scoring, goals, and feedback workflows
 - [ ] **Phase 4C** — Employee views, reporting dashboards, and visual charts
 

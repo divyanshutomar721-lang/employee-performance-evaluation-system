@@ -88,3 +88,93 @@ Managers organize employees into teams and assign team-specific roles.
 4. **Remove a Member**: Click **Remove** next to a member to unassign them from the team.
 5. **Add Additional Members**: Under **Add Member to Team**, choose from available unassigned employees, enter their team role, and click **Add Member**.
 6. **Delete Team**: Click **Delete Team** and confirm the browser warning to delete the team and clear its member associations.
+
+---
+
+## Manager: Evaluating an Employee
+
+Managers evaluate direct reports on team performance cycles, computing overall scores and assigning performance tiers (Rocket Stages).
+
+### 1. Understanding Ratings, Formula, and Rocket Stages
+- **Criterion Ratings**: Managers assign integer ratings from 1 to 5 per active criterion:
+  - `1`: Launchpad (Foundational)
+  - `2`: Liftoff (Developing)
+  - `3`: Orbit (Proficient / Expected Standard)
+  - `4`: Cruise (Exceeding Expectations)
+  - `5`: Summit (Exceptional Leadership / Mastery)
+- **Score Calculation Formula**:
+  $$\text{Overall Score} = \left(\frac{\sum (\text{rating} \times \text{weight})}{5 \times \sum \text{weight}}\right) \times 100$$
+  *Worked Example*: An evaluation with two criteria:
+  - Criterion A: Weight 60, Rating 4
+  - Criterion B: Weight 40, Rating 5
+  - Weighted sum: $(4 \times 60) + (5 \times 40) = 240 + 200 = 440$
+  - Maximum possible: $5 \times (60 + 40) = 5 \times 100 = 500$
+  - Overall Score: $(440 / 500) \times 100 = 88.00\%$
+  - Corresponding Rocket Stage: **Cruise**
+- **Rocket Stage Thresholds**:
+  - `Launchpad`: Score $< 40.00$
+  - `Liftoff`: Score $40.00$ to $< 60.00$
+  - `Orbit`: Score $60.00$ to $< 75.00$
+  - `Cruise`: Score $75.00$ to $< 90.00$
+  - `Summit`: Score $\ge 90.00$
+
+### 2. Conduct a New Performance Evaluation
+1. From the navigation bar, click **Evaluations** (or go to `/manager/evaluations`).
+2. Click **New Evaluation** (or navigate to `/manager/evaluations/new`).
+3. Select an evaluated **Employee** from your managed direct reports.
+4. (Optional) Select the associated **Team**.
+5. Enter the **Evaluation Period** label (e.g., `Q3 2026`).
+6. Enter general **Summary Remarks**.
+7. In the criteria scoring section, select a rating (1 to 5) for each criterion and enter optional specific comments.
+8. Watch the **Live Preview** banner automatically update with the projected overall score and Rocket Stage.
+9. Click **Submit Evaluation**. Upon saving, criteria names and weights are permanently snapshotted.
+
+### 3. Review and Delete Evaluations
+1. On the **Performance Evaluations** page (`/manager/evaluations`), locate the evaluation row.
+2. Click **Open** to view the full evaluation breakdown, snapshot weights, ratings, and feedback remarks.
+3. To delete an evaluation, click **Delete Evaluation** on the detail page and confirm the prompt.
+
+---
+
+## Manager: Goals
+
+Managers assign measurable goals to employees and track milestones toward completion.
+
+### 1. Assign a New Goal
+1. From the navigation bar, click **Goals** (or navigate to `/manager/goals`).
+2. In the **Assign Goal to Employee** form, select the target employee.
+3. Choose a future **Target Completion Date** (past dates are rejected).
+4. Enter a clear **Goal Description** (up to 500 characters).
+5. Click **Assign Goal**. The goal appears in the roster with initial status `NOT STARTED` (0% progress).
+
+### 2. Update Goal Progress
+1. Locate the employee's goal in the **Assigned Goals Roster**.
+2. In the **Progress** column, enter the new progress percentage (0 to 100) and click **Update**.
+3. Status transitions automatically:
+   - `0%`: `NOT STARTED`
+   - `1% - 99%`: `IN PROGRESS`
+   - `100%`: `COMPLETED`
+4. Goals whose target completion date has passed without reaching 100% display a red **Overdue** badge.
+
+### 3. Edit and Delete Goals
+1. Click **Edit** on any assigned goal to adjust its description or target date.
+2. Click **Delete** and confirm the prompt to permanently remove a goal.
+
+---
+
+## Manager: Feedback
+
+Managers provide continuous qualitative 360 feedback and ratings outside formal evaluation cycles.
+
+### 1. Submit Continuous Feedback
+1. From the navigation bar, click **Feedback** (or navigate to `/manager/feedback`).
+2. In the **Give Feedback to Employee** form, select the employee recipient.
+3. (Optional) Link the feedback to an existing evaluation period, or select *Not linked to an evaluation*.
+4. Select a performance rating from **1 (Launchpad)** to **5 (Summit)**.
+5. Enter constructive **Feedback Comments** (up to 1000 characters).
+6. Click **Submit Feedback**.
+
+### 2. Manage Feedback Records
+1. In the **Feedback Given Roster**, review all feedback you have submitted, along with recipient, rating badge, linked evaluation period, and submission date.
+2. To remove a feedback entry, click the **Delete** (trash) icon and confirm the prompt.
+
